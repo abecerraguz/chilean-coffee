@@ -85,6 +85,12 @@ export default function ComingSoonContent() {
               </p>
 
               {/* Logo central (lockup oficial) */}
+                    <motion.div
+        initial={{ scale: 1 }}
+        animate={prefersReducedMotion ? { scale: 1.1 } : { scale: [1, 1.07, 1] }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
+        className="will-change-transform"
+      >
               <figure className="mt-4">
                 <img
                   src="/brand/logo-central.svg"
@@ -94,6 +100,7 @@ export default function ComingSoonContent() {
                 />
                 <figcaption className="sr-only">Chilean Coffee</figcaption>
               </figure>
+      </motion.div>
 
               <p className="mt-4 max-w-xl text-white/80 text-base md:text-lg">
                 Café chileno con carácter urbano, humor criollo y servicio a toda hora. ¿Cachái?
