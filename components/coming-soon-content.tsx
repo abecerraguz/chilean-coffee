@@ -1,26 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform, useReducedMotion  } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { MapPin, Clock, ExternalLink, Instagram, Facebook, Mail } from "lucide-react";
-
 /** CONFIG */
-const MAPS_URL = "https://maps.google.com/?q=Barrio+Italia,+Santiago"; // TODO
-const MENU_URL = "/carta.pdf"; // TODO
-const ADDRESS = "Av. ——— 123, Barrio Italia, Ñuñoa, Santiago"; // TODO
+const MAPS_URL = "https://maps.app.goo.gl/LkcM9Qhhnch4GibRA"; // TODO
+const MENU_URL = "https://qrfy.io/p/4H3Im6fI8r"; // TODO
+const ADDRESS = "Dirección: Av. Santa Isabel 517, Providencia"; // TODO
 const HOURS: { d: string; h: string }[] = [
-  { d: "Lun–Vie", h: "08:30–20:00" },
-  { d: "Sáb", h: "09:00–21:00" },
-  { d: "Dom", h: "09:00–20:00" },
+  { d: "Lun–Vie", h: "07:30–19:30" },
+  { d: "Sáb", h: "10:30–19:30" },
+  { d: "Dom", h: "10:30–19:30" },
+  { d: "Festivos", h: "10:30–19:30" },
 ];
-const SOCIALS = { ig: "https://instagram.com/", fb: "https://facebook.com/" }; // TODO
+const SOCIALS = { ig: "https://www.instagram.com/chileancoffee/" }; // TODO
+import AOS from "aos"
+import "aos/dist/aos.css";
 
 export default function ComingSoonContent() {
   const [email, setEmail] = useState("");
+  const [showSecondLogo, setShowSecondLogo] = useState(false);
   const { scrollY } = useScroll();
   const heroY = useTransform(scrollY, [0, 400], [0, -60]);
+
+  // Inicializar AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-in-out',
+      once: false, // Cambiado a false para permitir animaciones repetidas
+      mirror: true  // Cambiado a true para permitir animaciones en ambas direcciones
+    });
+  }, []);
+
+  // Detectar scroll para mostrar/ocultar el segundo logo
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const triggerPoint = 300; // Punto donde aparece el segundo logo (aumentado para mejor efecto)
+      
+      if (scrollPosition > triggerPoint && !showSecondLogo) {
+        setShowSecondLogo(true);
+        // Refrescar AOS para las nuevas animaciones
+        setTimeout(() => {
+          AOS.refresh();
+        }, 100);
+      } else if (scrollPosition <= triggerPoint && showSecondLogo) {
+        setShowSecondLogo(false);
+        // Refrescar AOS para las nuevas animaciones
+        setTimeout(() => {
+          AOS.refresh();
+        }, 100);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [showSecondLogo]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,36 +70,51 @@ export default function ComingSoonContent() {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
+      {/* Estilos personalizados para transiciones suaves */}
+      <style jsx>{`
+        [data-aos="fade-out"] {
+          opacity: 0 !important;
+          transform: translateY(20px) !important;
+        }
+        
+        .logo-container figure {
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+        
+        .logo-container img {
+          max-height: 400px;
+          object-fit: contain;
+        }
+      `}</style>
+      
       {/* HEADER */}
       <header className="sticky top-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 md:px-8 h-16 md:h-20 flex items-center justify-between">
-     <Link href="/" className="flex items-center gap-3">
-      <motion.div
-        initial={{ scale: 1 }}
-        animate={prefersReducedMotion ? { scale: 1 } : { scale: [1, 1.07, 1] }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        className="will-change-transform"
-      >
-        <Image
-          src="/brand/logo-mensaje.svg"
-          alt="Chilean Coffee"
-          width={256}   // cálculo interno (SVG)
-          height={256}
-          priority
-          className="h-12 md:h-14 lg:h-16 xl:h-20 w-auto shrink-0 mt-5"
-        />
-      </motion.div>
-  {/* <span className="font-[var(--font-bebas)] text-2xl md:text-3xl lg:text-4xl tracking-wider">
+          <Link href="/" className="flex items-center gap-3">
+            <motion.div
+              initial={{ scale: 1 }}
+              animate={prefersReducedMotion ? { scale: 1 } : { scale: [1, 1.07, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="will-change-transform"
+            >
+              <Image
+                src="/brand/logo-mensaje.svg"
+                alt="Chilean Coffee"
+                width={256}   // cálculo interno (SVG)
+                height={256}
+                priority
+                className="h-12 md:h-14 lg:h-16 xl:h-20 w-auto shrink-0 mt-5"
+              />
+            </motion.div>
+            {/* <span className="font-[var(--font-bebas)] text-2xl md:text-3xl lg:text-4xl tracking-wider">
     CHILEAN COFFEE
   </span> */}
-</Link>
+          </Link>
 
           <nav className="flex items-center gap-4 text-white/80">
             <a href={SOCIALS.ig} target="_blank" rel="noreferrer" aria-label="Instagram" className="hover:text-white">
-              <Instagram className="w-5 h-5" />
-            </a>
-            <a href={SOCIALS.fb} target="_blank" rel="noreferrer" aria-label="Facebook" className="hover:text-white">
-              <Facebook className="w-5 h-5" />
+              <Instagram className="w-10 h-10" />
             </a>
           </nav>
         </div>
@@ -76,37 +129,65 @@ export default function ComingSoonContent() {
           </div>
         </div>
 
-        <motion.div style={{ y: heroY }} className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-24">
+
+
+        <motion.div style={{ y: heroY }} className="mx-auto max-w-7xl px-4 md:px-8 py-16 md:py-24 relative z-20">
           <div className="grid md:grid-cols-12 gap-8 items-end">
             {/* Título + CTAs */}
-            <div className="md:col-span-7">
+            <div className="md:col-span-7" data-aos="fade-right">
               <p className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1 rounded-full bg-white/20">
                 YA ABRIMOS EN BARRIO ITALIA
               </p>
 
-              {/* Logo central (lockup oficial) */}
-                    <motion.div
+              {/* Contenedor para los logos con sticky positioning */}
+              <div className="mt-4 h-[300px] md:h-[400px] sticky top-20 z-10">
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Primer logo - visible al inicio */}
+                  <div 
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out ${
+                      !showSecondLogo 
+                        ? 'opacity-100 visible translate-y-0' 
+                        : 'opacity-0 invisible translate-y-4'
+                    }`}
+                    style={{ transitionDelay: !showSecondLogo ? '200ms' : '0ms' }}
+                  >
+                    <img 
+                      src="/brand/logo-central.svg" 
+                      alt="Chilean Coffee" 
+                      className="w-full h-full object-contain drop-shadow-2xl max-w-4xl" 
+                    />
+                  </div>
+                  
+                  {/* Segundo logo - aparece con scroll */}
+                  <div 
+                    className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out ${
+                      showSecondLogo 
+                        ? 'opacity-100 visible translate-y-0' 
+                        : 'opacity-0 invisible translate-y-4'
+                    }`}
+                    style={{ transitionDelay: showSecondLogo ? '200ms' : '0ms' }}
+                  >
+                                       <motion.div
         initial={{ scale: 1 }}
         animate={prefersReducedMotion ? { scale: 1.1 } : { scale: [1, 1.07, 1] }}
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
         className="will-change-transform"
       >
-              <figure className="mt-4">
-                <img
-                  src="/brand/logo-central.svg"
-                  alt="Chilean Coffee — logotipo"
-                  className="block w-[min(92vw,1120px)] h-auto"
-                  draggable={false}
-                />
-                <figcaption className="sr-only">Chilean Coffee</figcaption>
-              </figure>
-      </motion.div>
+                    <img 
+                      src="/brand/chachai.svg" 
+                      alt="Chilean Coffee - Cachái" 
+                      className="w-full h-full object-contain drop-shadow-2xl max-w-4xl" 
+                    />
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
 
               <p className="mt-4 max-w-xl text-white/80 text-base md:text-lg">
-                Café chileno con carácter urbano, humor criollo y servicio a toda hora. ¿Cachái?
+                Café chileno con carácter urbano, humor criollo y servicio a toda hora. ¿CACHAI?
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-6 flex flex-wrap gap-3 pointer-events-auto">
                 <a
                   href={MAPS_URL}
                   target="_blank"
@@ -133,7 +214,8 @@ export default function ComingSoonContent() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
-              className="md:col-span-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 md:p-7"
+              className="md:col-span-5 rounded-2xl border border-white/10 bg-white/5 backdrop-blur p-6 md:p-7 pointer-events-auto"
+              data-aos="fade-left"
             >
               <div className="flex items-start gap-3">
                 <div className="grid place-items-center w-9 h-9 rounded-md bg-white/10">
@@ -168,13 +250,13 @@ export default function ComingSoonContent() {
           </div>
         </motion.div>
 
-        {/* marquee ¿CACHÁI? */}
+        {/* marquee ¿CACHAI? */}
         <div className="border-t border-white/10">
           <div className="overflow-hidden">
             <div className="animate-[marquee_18s_linear_infinite] whitespace-nowrap py-3 text-white/70">
               {Array.from({ length: 12 }).map((_, i) => (
                 <span key={i} className="mx-6 font-display tracking-widest text-2xl">
-                  ¿CACHÁI? • PA’ TOMAR ONCE, A TODA HORA • CHILEAN COFFEE •
+                  ¿CACHAI? • LA ONCE, A TODA HORA • CHILEAN COFFEE •
                 </span>
               ))}
             </div>
@@ -197,8 +279,8 @@ export default function ComingSoonContent() {
 
           <div className="grid md:grid-cols-3 gap-6">
             <PosterCard
-              title="¿CACHÁI?"
-              caption="Pa’ tomar once, a toda hora."
+              title="¿CACHAI?"
+              caption="LA ONCE, A TODA HORA."
               invert
               svg={
                 <svg viewBox="0 0 120 120" className="w-24 h-24">
@@ -235,7 +317,7 @@ export default function ComingSoonContent() {
 
       {/* Newsletter */}
       <section className="bg-black py-14 border-t border-white/10">
-        <div className="mx-auto max-w-3xl px-4 md:px-8 text-center">
+        <div className="mx-auto max-w-3xl px-4 md:px-8 text-center" data-aos="fade-up">
           <h3 className="font-display text-4xl md:text-5xl tracking-wide">PRONTO: TIENDA & HISTORIAS</h3>
           <p className="text-white/70 mt-2">Déjanos tu correo y te avisamos sin spam.</p>
 
@@ -263,7 +345,7 @@ export default function ComingSoonContent() {
       {/* FOOTER */}
       <footer className="bg-black border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 md:px-8 py-8 text-center text-sm text-white/70">
-          © {new Date().getFullYear()} Chilean Coffee — Pa’ tomar once, a toda hora.
+          © {new Date().getFullYear()} Chilean Coffee — LA ONCE, A TODA HORA.
         </div>
       </footer>
 
@@ -282,8 +364,8 @@ export default function ComingSoonContent() {
               addressRegion: "Región Metropolitana",
               addressCountry: "CL",
             },
-            url: "https://tu-dominio.cl", // TODO
-            sameAs: [SOCIALS.ig, SOCIALS.fb],
+            url: "https://chileancoffee.cl/", // TODO
+            sameAs: [SOCIALS.ig],
             servesCuisine: "Coffee",
           }),
         }}
