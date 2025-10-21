@@ -12,8 +12,7 @@ const ADDRESS = "Dirección: Av. Santa Isabel 517, Providencia"; // TODO
 const HOURS: { d: string; h: string }[] = [
   { d: "Lun–Vie", h: "07:30–19:30" },
   { d: "Sáb", h: "10:30–19:30" },
-  { d: "Dom", h: "10:30–19:30" },
-  { d: "Festivos", h: "10:30–19:30" },
+  { d: "Dom y Festivos", h: "10:30–19:30" }
 ];
 const SOCIALS = { ig: "https://www.instagram.com/chileancoffee/" }; // TODO
 import AOS from "aos"
